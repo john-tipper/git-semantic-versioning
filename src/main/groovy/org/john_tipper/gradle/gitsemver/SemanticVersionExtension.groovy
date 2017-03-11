@@ -80,8 +80,8 @@ class SemanticVersionExtension {
      * Reads information from git and sets internal variables appropriately
      */
     void readGit() {
-        evaluateGitVersion()
         evaluateCurrentGitBranch()
+        evaluateGitVersion()
     }
 
     /**
@@ -89,12 +89,18 @@ class SemanticVersionExtension {
      */
     void evaluateCurrentGitBranch() {
         currentBranch = SimpleCommandLineExecutor.executeCommand("git rev-parse --abbrev-ref HEAD")
+
+        if (currentBranch != null) {
+            currentBranch = currentBranch.substring(currentBranch.indexOf('/') + 1)  // get the bit of the branch after the '/': KEY-1234-some-branch-name
+        }
     }
 
     /**
      * Evaluate the version from git and save it
      * The branch is assumed to be untagged if the number of additional commits on top of the tag, as returned by
      * git describe, is 0 or there are no tags matching "vXXX-XXX-XXX.  git describe returns "tag-commits-hash", where commits is a number.
+     *
+     * It requires the current branch to have been evaluated before calling this method.
      */
     void evaluateGitVersion() {
         String tagDescription = SimpleCommandLineExecutor.executeCommand("git describe --always --long")
@@ -147,7 +153,7 @@ class SemanticVersionExtension {
             //     or underscore separated string based on the JIRA issue name
 
             // let's try to simplify this to extract just the KEY-N and prefix with the first character
-            if (currentBranch.count('/') == 1) {
+            if (currentBranch?.count('/') == 1) {
                 def branchComponentList = currentBranch.tokenize('/') // break down the branch
 
                 def typePrefix = branchComponentList[0].charAt(0)  // feature becomes f, etc
@@ -182,6 +188,7 @@ class SemanticVersionExtension {
      * @return should we do a version tag
      */
     boolean shouldVersionGitTag() {
+        println "$isUntagged $isCI ${isMasterBranch()}"
         return (isUntagged && isCI && isMasterBranch())
     }
 

@@ -17,18 +17,12 @@ class GitSemanticVersioningPlugin implements Plugin<Project> {
     def void apply(Project project) {
         def ext = project.extensions.create("semanticVersionExtension", SemanticVersionExtension)
 
-        ext.setMajorVersion((project.property('majorVersion') ?: "0") as String)
-        ext.setMinorVersion((project.property('minorVersion') ?: "0") as String)
+        ext.setMajorVersion((project.findProperty('majorVersion') ?: "0") as String)
+        ext.setMinorVersion((project.findProperty('minorVersion') ?: "0") as String)
 
         def buildNumber = System.getenv("BUILD_NUMBER") ?: "0"
         ext.setCiBuildNumber(buildNumber.toInteger())
-
-        def branch = System.getenv("GIT_BRANCH") // e.g. "feature/KEY-1234-some-branch-name"
-        branch = branch.substring(branch.indexOf('/')+1) // get the bit of the branch after the '/': KEY-1234-some-branch-name
-
-        ext.setCurrentBranch(branch)
         ext.setIsCI(project.rootProject.hasProperty('ci'))
-
         ext.readGit()
 
         project.tasks.create("makeVersionGitTag") {
@@ -42,8 +36,8 @@ class GitSemanticVersioningPlugin implements Plugin<Project> {
 
             doLast {
                 def tag = ext.gitVersionTag()
-                SimpleCommandLineExecutor.executeCommand("git tag -a $tag -m Version $tag")
-                SimpleCommandLineExecutor.executeCommand("git push origin tag")
+                SimpleCommandLineExecutor.executeCommand(["git", "tag", "-a", tag, "-m", "Version $tag"])
+                SimpleCommandLineExecutor.executeCommand(["git", "push", "origin", tag])
             }
         }
 
@@ -60,8 +54,8 @@ class GitSemanticVersioningPlugin implements Plugin<Project> {
 
             doLast {
                 def tag = "#${ext.ciBuildNumber}"
-                SimpleCommandLineExecutor.executeCommand("git tag $tag")
-                SimpleCommandLineExecutor.executeCommand("git push origin $tag")
+                SimpleCommandLineExecutor.executeCommand(["git", "tag", tag])
+                SimpleCommandLineExecutor.executeCommand(["git", "push", "origin", tag])
             }
         }
 

@@ -9,15 +9,18 @@
  */
 
 group 'org.john-tipper.gradle'
-version '0.1-SNAPSHOT'
+version '1.0'
 
 task wrapper(type: Wrapper) {
-  gradleVersion = '3.4'
-  distributionUrl = "https://services.gradle.org/distributions/gradle-$gradleVersion-all.zip"
+    gradleVersion = '3.4'
+    distributionUrl = "https://services.gradle.org/distributions/gradle-$gradleVersion-all.zip"
 }
 
 apply plugin: 'groovy'
 apply plugin: 'java'
+
+apply plugin: 'maven'
+apply plugin: 'signing'
 
 sourceCompatibility = 1.8
 
@@ -31,5 +34,58 @@ dependencies {
     testCompile group: 'junit', name: 'junit', version: '4.11'
     testCompile('org.spockframework:spock-core:1.0-groovy-2.4') {
         exclude module: "groovy-all"
+    }
+}
+
+artifacts {
+    archives jar
+}
+
+signing {
+    sign configurations.archives
+}
+
+def ossRepository = "https://oss.sonatype.org/service/local/staging/deploy/maven2/"
+if (version.endsWith("-SNAPSHOT")) {
+    ossRepository = "https://oss.sonatype.org/content/repositories/snapshots/"
+}
+
+uploadArchives {
+    repositories {
+        mavenDeployer {
+            beforeDeployment { MavenDeployment deployment -> signing.signPom(deployment) }
+
+            repository(url: ossRepository) {
+                authentication(userName: sonatypeUser, password: sonatypePassword)
+            }
+
+            pom.project {
+                name 'git-semantic-versioning'
+                packaging 'jar'
+                description 'git-semantic-versioning applies semantic versioning to a Gradle version and will allow CI to tag branches with the version'
+                url 'https://github.com/john-tipper/git-semantic-versioning'
+
+                scm {
+                    url 'scm:git@github.com:john-tipper/git-semantic-versioning.git'
+                    connection 'scm:git@github.com:john-tipper/git-semantic-versioning.git'
+                    developerConnection 'scm:git@github.com:john-tipper/git-semantic-versioning.git'
+                }
+
+                licenses {
+                    license {
+                        name 'The Apache Software License, Version 2.0'
+                        url 'http://www.apache.org/licenses/LICENSE-2.0.txt'
+                        distribution 'repo'
+                    }
+                }
+
+                developers {
+                    developer {
+                        id 'john-tipper'
+                        name 'John Tipper'
+                    }
+                }
+            }
+        }
     }
 }

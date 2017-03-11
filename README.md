@@ -58,20 +58,39 @@ The label applied is an annotated one (i.e. applied using `git tag -a`, c.f. [Gi
 
 Within `build.gradle`:
 
-    apply plugin: 'org.john_tipper.gradle.git-semantic-versioning'
+    buildscript {
+      repositories {
+        mavenCentral()
+      }
 
-This has been submitted to `MavenCentral` and you will need this to be listed as one of your repositories.    
+      dependencies {
+        classpath 'org.john-tipper.gradle:git-semantic-versioning:1.0' // replace 1.0 with whatever version you need
+      }
+    }
+
+    apply plugin: 'git-semantic-versioning'
     
-Within `settings.gradle` define the major and minor versions of the project (i.e. you need to increment these manually):
+Within the project's `gradle.properties` define the major and minor versions of the project (i.e. you need to increment these manually):
 
-    majorVersion = '1'  // major version that will be applied, this must be a string that represents an integer
-    minorVersion = '2'  // minor version, this is a string but it may not represent an integer, to allow for things like release candidates e.g. 2.1rc2
+    majorVersion = 1  // major version that will be applied, this must be an integer to be compliant with semantic versioning
+    minorVersion = 2  // minor version, this is a string but it may not represent an integer, to allow for things like release candidates e.g. 2.1rc2
     
 Call the tasks with a `ci` property if the task is being run by Jenkins; this can be done by calling with the option `-Pci`, e.g.:
 
     gradlew makeBuildGitTag -Pci
     
 These tasks should be called when you know that the code is ok, i.e. after testing, code quality examination etc.
+
+##Deployment of this plugin to MavenCentral
+
+There is an `uploadarchives` task in Gradle that will deploy the built plugin to MavenCentral.  It requires the following properties to be set (and which should normally be set in `~/.gradle/gradle.properties` in order to prevent the passwords being committed to source control):
+  
+    sonatypeUser=<OSSRH username>  
+    sonatypePassword=<OSSRH password>  
+  
+    signing.keyId=<Created by gpg2>  
+    signing.password=<Password used to create the key>  
+    signing.secretKeyRingFile=<Path to the secret key file>
     
 ##To Do
 * Very basic testing has been done, but not for all possible combinations of branch name, CI/not-CI, version numbers etc.
