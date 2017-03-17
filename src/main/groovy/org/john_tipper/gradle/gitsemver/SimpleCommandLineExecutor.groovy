@@ -10,8 +10,6 @@
 
 package org.john_tipper.gradle.gitsemver
 
-import org.gradle.api.GradleException
-
 /**
  * Very simple utility class to execute shell commands that is used to facilitate testing
  */
@@ -29,7 +27,7 @@ class SimpleCommandLineExecutor {
         process.waitForProcessOutput(strout, strerr)
 
         if (process.exitValue()) {
-            throw new GradleException("Error running command: $command \nError: $strerr")
+            return null
         }
 
         return strout.toString().trim()

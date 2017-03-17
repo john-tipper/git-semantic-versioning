@@ -64,7 +64,7 @@ Within `build.gradle`:
       }
 
       dependencies {
-        classpath 'org.john-tipper.gradle:git-semantic-versioning:1.0' // replace 1.0 with whatever version you need
+        classpath 'org.john-tipper.gradle:git-semantic-versioning:1.1' // replace 1.1 with whatever version you need
       }
     }
 
