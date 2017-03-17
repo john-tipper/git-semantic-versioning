@@ -106,7 +106,7 @@ class SemanticVersionExtension {
         String tagDescription = SimpleCommandLineExecutor.executeCommand("git describe --always --long")
 
         isUntagged = true
-        if (tagDescription.startsWith("v") && (tagDescription =~ /-/).count == 2) {
+        if (tagDescription != null && tagDescription.startsWith("v") && (tagDescription =~ /-/).count == 2) {
             def tagComponents = tagDescription.tokenize('-') // split into [tag, num commits, hash]
 
             // if there are no commits on top of the last tag then the branch has already been tagged
