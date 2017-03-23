@@ -169,7 +169,10 @@ class SemanticVersionExtension {
                     branchDescription = "$typePrefix" + branchComponentList[1]
                 }
 
-                version = "$majorVersion.$minorVersion.$patchVersion-$branchDescription-SNAPSHOT"
+                version = "$majorVersion.$minorVersion.$patchVersion-$branchDescription"
+                if (!isCI) {
+                    version += "-SNAPSHOT"
+                }
 
             } else {
                 // perhaps the branch wasn't created by JIRA, so just leave it

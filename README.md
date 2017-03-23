@@ -24,7 +24,11 @@ Additionally, the Gradle version of the project will be set according to the fol
       
       **$MAJOR.$MINOR.$PATCH-$CI_BUILD_NUMBER**
 
-  * If not being built by CI or not the master branch:  
+  * If being built by CI and not the master branch:  
+    
+      **$MAJOR.$MINOR.$PATCH-$BRANCH**
+
+  * If not being built by CI:  
     
       **$MAJOR.$MINOR.$PATCH-$BRANCH-SNAPSHOT**
 

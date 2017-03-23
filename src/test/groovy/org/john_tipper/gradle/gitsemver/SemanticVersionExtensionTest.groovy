@@ -82,7 +82,7 @@ class SemanticVersionExtensionTest extends Specification {
         then:
         1 * SimpleCommandLineExecutor.executeCommand("git describe --always --long") >> { cmd -> "v1.2.3-4-g0259fa5" }
         semanticVersionExtension.gitVersionTag() == "v1.3.0"
-        semanticVersionExtension.version == "1.3.0-fKEY1234-SNAPSHOT"
+        semanticVersionExtension.version == "1.3.0-fKEY1234"
     }
 
 
